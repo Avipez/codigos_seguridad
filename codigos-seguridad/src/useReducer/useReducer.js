@@ -2,68 +2,92 @@ import React from "react";
 
 const SECURITY_CODE = "paradigma";
 
-function UseState() {
-  const [state, setState] = React.useState({
-    value: "",
+function UseReducer() {
+
+  const initialState = {
     error: false,
     loading: false,
-    deleted: false,
+    delted: false,
     confirmed: false,
-  });
+    value: "",
+  };
 
-  /* const [value, setValue] = React.useState("");
-  const [error, setError] = React.useState(false);
-  const [loading, setLoading] = React.useState(false); */
+  const reducer = (state, action) => {
+    if (reducerObject(state)[action.type]) {
+      return reducerObject(state, action.payload)[action.type];
+    } else {
+      return state;
+    }
+  };
 
-  const onError = () => {
-    setState({
+  const reducerObject = (state, payload) => ({
+    [actionType.error]: {
       ...state,
       error: true,
       loading: false,
-    });
-  };
-
-  const onConfirm = () => {
-    setState({
+    },
+    [actionType.confirm]: {
       ...state,
       error: false,
       loading: false,
       confirmed: true,
-    });
-  };
-
-  const onWrite = (newValue) => {
-    setState({
+    },
+    [actionType.write]: {
       ...state,
-      value: newValue,
-    });
-  };
-
-  const onCheck = () => {
-    setState({
+      value: payload,
+    },
+    [actionType.check]: {
       ...state,
-      loading: !state.loading,
-      error: false,
-    });
-  };
-
-  const onDelete = () => {
-    setState({
+      loading: true,
+    },
+    [actionType.delete]: {
       ...state,
       deleted: true,
       confirmed: true,
-    });
-  };
-
-  const onReset = () => {
-    setState({
+    },
+    [actionType.reset]: {
       ...state,
       error: false,
       loading: false,
       confirmed: false,
       deleted: false,
       value: "",
-    });
+    },
+  });
+
+  const actionType = {
+    confirm: "CONFIRM",
+    error: "ERROR",
+    write: "WRITE",
+    check: "CHECK",
+    delete: "DELETE",
+    reset: "RESET",
+  };
+
+  const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  const onError = () => {
+    dispatch({ type: actionType.error });
+  };
+
+  const onConfirm = () => {
+    dispatch({ type: actionType.confirm });
+  };
+
+  const onCheck = () => {
+    dispatch({ type: actionType.check });
+  };
+
+  const onWrite = (newValue) => {
+    dispatch({ type: actionType.write, payload: newValue });
+  };
+
+  const onDelete = () => {
+    dispatch({ type: actionType.delete });
+  };
+
+  const onReset = () => {
+    dispatch({ type: actionType.reset });
   };
 
   React.useEffect(() => {
@@ -90,7 +114,7 @@ function UseState() {
   if (!state.deleted && !state.confirmed) {
     return (
       <div>
-        <h2>Eliminar con useState</h2>
+        <h2>Eliminar con useReducer</h2>
         <p>Por favor, escribe el código de seguridad.</p>
         {state.error && !state.loading && <p>Error: el código es incorrecto</p>}
         {state.loading && <p>Cargando ...</p>}
@@ -102,9 +126,7 @@ function UseState() {
           }}
         ></input>
         <button
-          onClick={() => {
-            onCheck();
-          }}
+          onClick={ onCheck }
         >
           Comprobar
         </button>
@@ -115,16 +137,12 @@ function UseState() {
       <React.Fragment>
         <p>¿Seguro que quieres eliminar el estado?</p>
         <button
-          onClick={() => {
-            onDelete();
-          }}
+          onClick={ onDelete }
         >
           Si eliminar
         </button>
         <button
-          onClick={() => {
-            onReset();
-          }}
+          onClick={ onReset }
         >
           No, me arrepenti
         </button>
@@ -135,9 +153,7 @@ function UseState() {
       <React.Fragment>
         <h2>UseState fue eliminado</h2>
         <button
-          onClick={() => {
-            onReset();
-          }}
+          onClick={ onReset }
         >
           Recuperar useState
         </button>
@@ -146,4 +162,4 @@ function UseState() {
   }
 }
 
-export { UseState };
+export { UseReducer };
